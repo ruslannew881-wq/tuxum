@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AUREON — Премиальная цифровая витрина</title>
+  
+  <!-- Шрифт Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#5855E7',
+              50: '#F0EFFF',
+              100: '#E4E2FF',
+              200: '#C9C6FF',
+              300: '#ADA9FE',
+              400: '#8A84FC',
+              500: '#5855E7', // Фирменный глубокий акцент
+              600: '#4844DC',
+              700: '#3834C8',
+              800: '#2A27A7',
+              900: '#1D1A81',
+            },
+            surface: {
+              light: '#FFFFFF',
+              dark: '#111725',
+              cardDark: 'rgba(17, 23, 37, 0.95)',
+            },
+            textMain: {
+              light: '#171923',
+              dark: '#F8FAFC',
+            },
+            textSub: {
+              light: '#73778A',
+              dark: '#94A3B8',
+            },
+            appBorder: {
+              light: '#E7E9F1',
+              dark: '#1E293B',
+            }
+          },
+          boxShadow: {
+            'subtle': '0 2px 8px rgba(0, 0, 0, 0.04)',
+            'subtle-hover': '0 12px 24px -6px rgba(0, 0, 0, 0.08)',
+            'glass': '0 8px 30px rgba(0, 0, 0, 0.04)',
+            'glass-dark': '0 8px 30px rgba(0, 0, 0, 0.4)',
+            'glow': '0 8px 20px -4px rgba(88, 85, 231, 0.3)',
+            'drawer': '-10px 0 35px rgba(0, 0, 0, 0.15)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Единая дизайн-система через CSS-переменные -->
+  <style>
+    :root {
+      --bg-primary: #F7F8FC;
+      --surface-card: #FFFFFF;
+      --text-main: #171923;
+      --text-sub: #73778A;
+      --accent: #5855E7;
+      --border-color: #E7E9F1;
+      --shadow-base: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-hover: 0 12px 24px -6px rgba(0, 0, 0, 0.08);
+      --radius-card: 1.25rem;
+      --radius-btn: 0.875rem;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .dark {
+      --bg-primary: #080B12;
+      --surface-card: #111725;
+      --text-main: #F8FAFC;
+      --text-sub: #94A3B8;
+      --accent: #6C69FF;
+      --border-color: #1E293B;
+      --shadow-base: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-hover: 0 12px 24px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: var(--safe-bottom);
+    }
+
+    /* Анимация пульсации скелетона */
+    @keyframes shimmerAnim {
+      100% { transform: translateX(100%); }
+    }
+    
+    .shimmer-mask {
+      position: relative;
+      overflow: hidden;
+    }
+    .shimmer-mask::after {
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      transform: translateX(-100%);
+      background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.25) 30%,
+        rgba(255, 255, 255, 0.5) 60%,
+        rgba(255, 255, 255, 0)
+      );
+      animation: shimmerAnim 1.6s infinite;
+      content: '';
+    }
+    .dark .shimmer-mask::after {
+      background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.03) 30%,
+        rgba(255, 255, 255, 0.08) 60%,
+        rgba(255, 255, 255, 0)
+      );
+    }
+
+    /* Отключение анимаций при prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Кастомный скроллбар */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.5);
+    }
+  </style>
+</head>
+<body class="min-h-screen transition-colors duration-300 selection:bg-brand selection:text-white relative overflow-x-hidden flex flex-col justify-between">
+
+  <!-- Ссылка для скринридеров -->
+  <a href="#mainContent" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-brand focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none">
+    Перейти к содержимому
+  </a>
+
+  <!-- Декоративные мягкие световые пятна (Project Aura) -->
+  <div class="pointer-events-none fixed inset-0 overflow-hidden -z-10" aria-hidden="true">
+    <div id="ambientGlow1" class="absolute -top-40 left-1/4 w-[600px] h-[600px] bg-brand/10 dark:bg-brand/15 rounded-full blur-[130px] transition-transform duration-700 ease-out"></div>
+    <div id="ambientGlow2" class="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-indigo-400/10 dark:bg-brand-900/15 rounded-full blur-[140px] transition-transform duration-700 ease-out"></div>
+  </div>
+
+  <!-- Плашка состояния сети (Offline) -->
+  <aside id="networkBanner" class="hidden fixed top-0 inset-x-0 z-50 bg-amber-500 text-slate-950 text-xs font-semibold py-2 px-4 text-center shadow-md transition-transform" role="status" aria-live="polite">
+    <span class="inline-flex items-center gap-2">
+      <svg class="w-4 h-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-2.828-6.364m0 0l2.828 2.829m-2.828-2.829L3 3m6.364 6.364a5 5 0 017.072 0" />
+      </svg>
+      <span id="networkBannerText">Нет соединения с интернетом. Проверьте сетевое подключение.</span>
+    </span>
+  </aside>
+
+  <!-- ==================== ШАПКА САЙТА (HEADER) ==================== -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-[#080B12]/85 border-b border-appBorder-light dark:border-appBorder-dark transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      
+      <!-- Логотип бренда -->
+      <a href="#/catalog" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-xl p-1" aria-label="AUREON Главная">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand to-indigo-400 flex items-center justify-center text-white shadow-glow group-hover:scale-105 transition-transform duration-300">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2" />
+            <polyline points="2 17 12 22 22 17" />
+            <polyline points="2 12 12 17 22 12" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-brand to-indigo-600 dark:from-white dark:via-slate-200 dark:to-brand-400 bg-clip-text text-transparent">
+            AUREON
+          </span>
+          <span class="text-[9px] tracking-widest uppercase font-semibold text-textSub-light dark:text-textSub-dark">
+            Digital Store
+          </span>
+        </div>
+      </a>
+
+      <!-- Умный поиск с подсказками (Smart Search) -->
+      <div class="relative flex-1 max-w-md mx-2 sm:mx-6 hidden md:block" id="searchWidgetContainer">
+        <div class="relative w-full">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            id="searchInput"
+            autocomplete="off"
+            placeholder="Поиск среди сотен товаров..."
+            class="w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm bg-slate-100/90 dark:bg-slate-900/90 border border-transparent focus:border-brand dark:focus:border-brand rounded-xl focus:outline-none focus:ring-2 focus:ring-brand/20 text-textMain-light dark:text-textMain-dark placeholder-slate-400 dark:placeholder-slate-500 transition-all"
+            aria-label="Поиск товаров"
+          />
+          <button
+            type="button"
+            id="searchClearBtn"
+            class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none"
+            aria-label="Очистить поиск"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Выпадающее окно подсказок поиска -->
+        <div
+          id="searchDropdown"
+          class="hidden absolute top-full mt-2 inset-x-0 bg-white dark:bg-surface-cardDark border border-appBorder-light dark:border-appBorder-dark rounded-2xl shadow-drawer backdrop-blur-xl z-50 overflow-hidden max-h-[420px] overflow-y-auto"
+          role="listbox"
+        >
+          <!-- Результаты поиска формируются динамически -->
+        </div>
+      </div>
+
+      <!-- Панель действий: Валюта, Язык, Тема, Избранное, Корзина, Заказы -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5">
+        
+        <!-- Переключатель валюты (USD / UZS) с подписью "Курс приблизительный" -->
+        <div class="relative group">
+          <button
+            type="button"
+            id="currencyToggleBtn"
+            class="px-2.5 py-1.5 text-xs font-bold rounded-xl border border-appBorder-light dark:border-appBorder-dark text-textMain-light dark:text-textMain-dark hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            aria-label="Сменить валюту"
+          >
+            <span id="currencyLabel">USD ($)</span>
+          </button>
+          <!-- Всплывающая подсказка -->
+          <div class="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] font-medium py-1 px-2 rounded-lg whitespace-nowrap shadow-md z-50">
+            Курс приблизительный (демо)
+          </div>
+        </div>
+
+        <!-- Переключатель языка RU / EN -->
+        <button
+          type="button"
+          id="langToggleBtn"
+          class="px-2 py-1.5 text-xs font-bold rounded-xl border border-appBorder-light dark:border-appBorder-dark text-textMain-light dark:text-textMain-dark hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-all"
+          title="Сменить язык (RU / EN)"
+          aria-label="Сменить язык"
+        >
+          <span id="langLabel">RU</span>
+        </button>
+
+        <!-- Переключатель темы (Dark / Light) -->
+        <button
+          type="button"
+          id="themeToggleBtn"
+          class="p-2.5 rounded-xl border border-appBorder-light dark:border-appBorder-dark text-textSub-light dark:text-textSub-dark hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-all"
+          title="Переключить тему оформления"
+          aria-label="Переключить тему"
+        >
+          <svg id="themeIconSun" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg id="themeIconMoon" class="w-4 h-4 block dark:hidden text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+
+        <!-- Кнопка «Мои заказы» -->
+        <button
+          type="button"
+          id="ordersOpenBtn"
+          class="p-2.5 rounded-xl border border-appBorder-light dark:border-appBorder-dark text-textSub-light dark:text-textSub-dark hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-all"
+          title="История моих заказов"
+          aria-label="Мои заказы"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+        </button>
+
+        <!-- Кнопка Избранного со счётчиком -->
+        <button
+          type="button"
+          id="favoritesOpenBtn"
+          class="relative p-2.5 rounded-xl border border-appBorder-light dark:border-appBorder-dark text-textSub-light dark:text-textSub-dark hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-all"
+          title="Открыть избранное"
+          aria-label="Избранное"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          <span id="favoritesBadge" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center scale-0 transition-transform">0</span>
+        </button>
+
+        <!-- Кнопка Корзины со счётчиком -->
+        <button
+          type="button"
+          id="cartOpenBtn"
+          class="relative flex items-center gap-2 px-3 py-2 rounded-xl bg-brand hover:bg-brand-600 text-white shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-all"
+          title="Открыть корзину"
+          aria-label="Корзина"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span class="hidden sm:inline text-xs font-semibold" data-i18n="cart">Корзина</span>
+          <span id="cartBadge" class="w-5 h-5 rounded-full bg-white text-brand text-[10px] font-bold flex items-center justify-center">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Мобильная строка поиска под шапкой -->
+    <div class="md:hidden px-4 pb-3">
+      <div class="relative w-full">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        </span>
+        <input
+          type="text"
+          id="mobileSearchInput"
+          placeholder="Поиск товаров..."
+          class="w-full pl-9 pr-4 py-2 text-xs bg-slate-100 dark:bg-slate-900 border border-transparent rounded-xl text-textMain-light dark:text-textMain-dark placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand"
+        />
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== ОСНОВНОЙ КОНТЕНТ ==================== -->
+  <main id="mainContent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 flex-grow w-full">
+
+    <!-- ==================== VIEW 1: ГЛАВНЫЙ КАТАЛОГ ==================== -->
+    <div id="catalogView" class="space-y-12">
+      
+      <!-- HERO-БЛОК -->
+      <section class="relative rounded-3xl bg-gradient-to-br from-white via-white/80 to-indigo-50/50 dark:from-surface-dark dark:via-[#111725] dark:to-brand-950/40 border border-appBorder-light dark:border-appBorder-dark backdrop-blur-xl shadow-glass p-6 sm:p-10 lg:p-12 overflow-hidden">
+        <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-brand/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
+          <div class="lg:col-span-7 space-y-5">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-950/60 border border-brand-200/60 dark:border-brand-800/60 text-brand text-xs font-semibold">
+              <span class="w-2 h-2 rounded-full bg-brand animate-ping"></span>
+              <span data-i18n="heroBadge">Новая коллекция товаров из DummyJSON API</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-textMain-light dark:text-textMain-dark leading-[1.15]">
+              Совершенство формы.<br/>
+              <span class="text-brand">Премиальный шопинг.</span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-textSub-light dark:text-textSub-dark max-w-xl leading-relaxed" data-i18n="heroDescription">
+              Откройте для себя оригинальные товары с мгновенным поиском, честными скидками, подробными характеристиками и бережной адаптацией.
+            </p>
+
+            <div class="flex flex-wrap items-center gap-3 pt-2">
+              <a
+                href="#catalog"
+                class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-brand hover:bg-brand-600 text-white font-semibold text-xs sm:text-sm shadow-glow transition-all active:scale-95"
+                data-i18n="heroExploreCta"
+              >
+                <span>Исследовать каталог</span>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+              </a>
+            </div>
+
+            <div class="pt-4 border-t border-appBorder-light dark:border-appBorder-dark grid grid-cols-3 gap-3 text-xs font-medium text-textSub-light dark:text-textSub-dark">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <span data-i18n="benefit1">Умный поиск</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                <span data-i18n="benefit2">Избранное PRO</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-brand flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <span>Только факты API</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 flex justify-center">
+            <div id="heroSpotlightContainer" class="w-full max-w-sm relative">
+              <div id="heroSpotlightSkeleton" class="p-6 rounded-2xl bg-white/70 dark:bg-surface-cardDark border border-appBorder-light dark:border-appBorder-dark shadow-subtle shimmer-mask space-y-4">
+                <div class="w-full h-48 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+                <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/3"></div>
+                <div class="h-6 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+                <div class="h-8 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+              </div>
+              <div id="heroSpotlightCard" class="hidden"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ПАНЕЛЬ КАТЕГОРИЙ (ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ) -->
+      <section class="space-y-4">
+        <div id="categoriesBar" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <!-- Генерируется через JS (кнопка «Все» + список категорий) -->
+        </div>
+      </section>
+
+      <!-- ПАНЕЛЬ ФИЛЬТРОВ И СОРТИРОВКИ -->
+      <section id="catalog" class="space-y-6 scroll-mt-24">
+        <div class="p-4 sm:p-6 rounded-2xl bg-white dark:bg-surface-cardDark border border-appBorder-light dark:border-appBorder-dark shadow-subtle space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span class="text-[11px] uppercase tracking-widest font-bold text-brand" data-i18n="catalogSubtitle">Каталог товаров</span>
+              <h2 class="text-2xl font-extrabold tracking-tight text-textMain-light dark:text-textMain-dark" data-i18n="catalogTitle">
+                Коллекция AUREON
+              </h2>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <span id="catalogCountBadge" class="text-xs font-semibold text-textSub-light dark:text-textSub-dark">
+                Загрузка...
+              </span>
+              <button
+                type="button"
+                id="resetFiltersBtn"
+                class="hidden px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/80 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-100 transition-colors"
+              >
+                Сбросить фильтры ✕
+              </button>
+            </div>
+          </div>
+
+          <!-- Фильтры: Диапазон цен, Только со скидкой, Только в наличии, Сортировка -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-center pt-3 border-t border-appBorder-light dark:border-appBorder-dark text-xs">
+            
+            <!-- Фильтр цены: от и до -->
+            <div class="lg:col-span-5 flex items-center gap-2">
+              <span class="font-semibold text-textSub-light dark:text-textSub-dark whitespace-nowrap">Цена:</span>
+              <input
+                type="number"
+                id="priceMinInput"
+                placeholder="От ($)"
+                min="0"
+                class="w-24 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-appBorder-light dark:border-appBorder-dark text-textMain-light dark:text-textMain-dark focus:outline-none focus:ring-2 focus:ring-brand"
+              />
+              <span class="text-slate-400">—</span>
+              <input
+                type="number"
+                id="priceMaxInput"
+                placeholder="До ($)"
+                min="0"
+                class="w-24 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-appBorder-light dark:border-appBorder-dark text-textMain-light dark:text-textMain-dark focus:outline-none focus:ring-2 focus:ring-brand"
+              />
+              <button
+                type="button"
+                id="applyPriceFilterBtn"
+                class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold transition-all"
+              >
+                ОК
+              </button>
+            </div>
+
+            <!-- Чекбоксы дополнительных фильтров -->
+            <div class="lg:col-span-4 flex items-center gap-4">
+              <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="filterDiscountOnly" class="w-4 h-4 rounded text-brand focus:ring-brand accent-brand cursor-pointer">
+                <span class="font-semibold text-textMain-light dark:text-textMain-dark">Только со скидкой</span>
+              </label>
+
+              <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="filterInStockOnly" class="w-4 h-4 rounded text-brand focus:ring-brand accent-brand cursor-pointer">
+                <span class="font-semibold text-textMain-light dark:text-textMain-dark">В наличии</span>
+              </label>
+            </div>
+
+            <!-- Сортировка -->
+            <div class="lg:col-span-3 flex items-center justify-end gap-2">
+              <label for="catalogSortSelect" class="font-semibold text-textSub-light dark:text-textSub-dark whitespace-nowrap">Сортировка:</label>
+              <select
+                id="catalogSortSelect"
+                class="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-appBorder-light dark:border-appBorder-dark text-textMain-light dark:text-textMain-dark font-semibold focus:outline-none focus:ring-2 focus:ring-brand"
+              >
+                <option value="default">По умолчанию</option>
+                <option value="price-asc">Сначала дешевле</option>
+                <option value="price-desc">Сначала дороже</option>
+                <option value="rating-desc">По рейтингу</option>
+                <option value="title-asc">По названию (А-Я)</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Ошибка загрузки каталога с кнопкой повтора -->
+        <div id="catalogError" class="hidden p-8 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-center space-y-4">
+          <svg class="w-12 h-12 mx-auto text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <h3 class="text-lg font-bold text-textMain-light dark:text-textMain-dark" data-i18n="errorTitle">Не удалось загрузить товары</h3>
+          <p id="catalogErrorMessage" class="text-sm text-textSub-light dark:text-textSub-dark max-w-md mx-auto"></p>
+          <button
+            type="button"
+            id="catalogRetryBtn"
+            class="px-5 py-2.5 rounded-xl bg-brand hover:bg-brand-600 text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-glow"
+            data-i18n="retryBtn"
+          >
+            Повторить попытку
+          </button>
+        </div>
+
+        <!-- Сетка товаров (1 на мобилке, 2 на планшете, 4 на десктопе) -->
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+
+        <!-- Сентинел для бесконечной прокрутки (IntersectionObserver) -->
+        <div id="infiniteScrollSentinel" class="h-10 flex items-center justify-center">
+          <div id="infiniteScrollSpinner" class="hidden w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin"></div>
+        </div>
+
+        <!-- Сообщение об окончании каталога -->
+        <div id="catalogEndMessage" class="hidden text-center py-6">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800/80 text-textSub-light dark:text-textSub-dark text-xs font-medium">
+            <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            <span data-i18n="allLoaded">Вы просмотрели все доступные товары</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- БЛОК «ВЫ НЕДАВНО СМОТРЕЛИ» В КАТАЛОГЕ -->
+      <section id="catalogRecentViewedSection" class="hidden space-y-4 pt-6 border-t border-appBorder-light dark:border-appBorder-dark">
+        <h3 class="text-xl font-extrabold text-textMain-light dark:text-textMain-dark">Вы недавно смотрели</h3>
+        <div id="catalogRecentGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
+      </section>
+
+    </div>
+
+    <!-- ==================== VIEW 2: СТРАНИЦА ТОВАРА (#/product/ID) ==================== -->
+    <div id="productDetailView" class="hidden space-y-12">
+      <!-- Контент страницы товара генерируется динамически через main.js -->
+    </div>
+
+  </main>
+
+  <!-- ==================== ФУТЕР МАГАЗИНА ==================== -->
+  <footer class="mt-16 border-t border-appBorder-light dark:border-appBorder-dark bg-white/50 dark:bg-surface-dark/50 py-8 text-xs text-textSub-light dark:text-textSub-dark text-center">
+    <div class="max-w-7xl mx-auto px-4 space-y-2">
+      <p class="font-bold text-textMain-light dark:text-textMain-dark">AUREON Digital Store Platform</p>
+      <p>Демонстрационная торговая платформа на чистом JavaScript, HTML и Tailwind CSS. Все данные получены из DummyJSON API.</p>
+    </div>
+  </footer>
+
+  <!-- ==================== ВЫДВИЖНАЯ ПАНЕЛЬ: КОРЗИНА (CART DRAWER) ==================== -->
+  <div id="cartDrawerBackdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0" aria-hidden="true"></div>
+  <aside
+    id="cartDrawer"
+    class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-surface-cardDark shadow-drawer border-l border-appBorder-light dark:border-appBorder-dark transform translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Корзина покупателя"
+  >
+    <!-- Шапка корзины -->
+    <div class="p-5 border-b border-appBorder-light dark:border-appBorder-dark flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+        <h3 class="font-extrabold text-lg text-textMain-light dark:text-textMain-dark">Корзина</h3>
+        <span id="cartDrawerCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-50 dark:bg-brand-950 text-brand">0</span>
+      </div>
+      <button type="button" id="cartDrawerCloseBtn" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" aria-label="Закрыть корзину">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <!-- Индикатор прогресса бесплатной доставки (демо-правило от $50) -->
+    <div class="p-4 bg-slate-50 dark:bg-slate-900/60 border-b border-appBorder-light dark:border-appBorder-dark space-y-1.5 text-xs">
+      <div class="flex justify-between font-semibold">
+        <span id="freeShippingLabel">Доставка</span>
+        <span id="freeShippingRemain" class="text-brand font-bold"></span>
+      </div>
+      <div class="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+        <div id="freeShippingBar" class="h-full bg-brand rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+      <p class="text-[10px] text-slate-400">* Демонстрационное правило магазина: бесплатная доставка от $50</p>
+    </div>
+
+    <!-- Список товаров в корзине -->
+    <div id="cartItemsList" class="flex-1 overflow-y-auto p-5 space-y-4">
+      <!-- Товары рендерятся динамически -->
+    </div>
+
+    <!-- Подвал корзины с расчётом скидок и кнопкой оформления -->
+    <div id="cartDrawerFooter" class="p-5 border-t border-appBorder-light dark:border-appBorder-dark bg-slate-50/80 dark:bg-slate-900/80 space-y-3">
+      <div class="space-y-1.5 text-xs">
+        <div class="flex justify-between text-textSub-light dark:text-textSub-dark">
+          <span>Сумма без скидки:</span>
+          <span id="cartSubtotal" class="font-bold line-through">$0.00</span>
+        </div>
+        <div id="cartSavingsRow" class="hidden flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+          <span>Ваша выгода (скидка):</span>
+          <span id="cartSavingsAmount">-$0.00</span>
+        </div>
+        <div class="flex justify-between text-base font-extrabold text-textMain-light dark:text-textMain-dark pt-1 border-t border-appBorder-light dark:border-appBorder-dark">
+          <span>Итого к оплате:</span>
+          <span id="cartGrandTotal">$0.00</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button
+          type="button"
+          id="cartCheckoutBtn"
+          class="flex-1 py-3 px-4 rounded-xl bg-brand hover:bg-brand-600 text-white font-bold text-xs shadow-glow transition-all active:scale-95 text-center"
+        >
+          Оформить заказ
+        </button>
+        <button
+          type="button"
+          id="cartClearBtn"
+          class="px-3 py-3 rounded-xl border border-appBorder-light dark:border-appBorder-dark hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 text-xs font-bold transition-all"
+          title="Очистить корзину"
+        >
+          🗑
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== ВЫДВИЖНАЯ ПАНЕЛЬ: ИЗБРАННОЕ (FAVORITES DRAWER) ==================== -->
+  <div id="favoritesDrawerBackdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0" aria-hidden="true"></div>
+  <aside
+    id="favoritesDrawer"
+    class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-surface-cardDark shadow-drawer border-l border-appBorder-light dark:border-appBorder-dark transform translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Избранные товары"
+  >
+    <div class="p-5 border-b border-appBorder-light dark:border-appBorder-dark flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-rose-500 fill-rose-500" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+        <h3 class="font-extrabold text-lg text-textMain-light dark:text-textMain-dark">Избранное PRO</h3>
+        <span id="favoritesDrawerCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950 text-rose-600">0</span>
+      </div>
+      <button type="button" id="favoritesDrawerCloseBtn" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" aria-label="Закрыть">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <div id="favoritesItemsList" class="flex-1 overflow-y-auto p-5 space-y-4">
+      <!-- Избранное рендерится динамически -->
+    </div>
+
+    <div id="favoritesDrawerFooter" class="p-4 border-t border-appBorder-light dark:border-appBorder-dark flex justify-between gap-3">
+      <button
+        type="button"
+        id="favoritesClearBtn"
+        class="w-full py-2.5 rounded-xl border border-appBorder-light dark:border-appBorder-dark hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold transition-all"
+      >
+        Очистить список
+      </button>
+    </div>
+  </aside>
+
+  <!-- ==================== ВЫДВИЖНАЯ ПАНЕЛЬ: ИСТОРИЯ ЗАКАЗОВ ==================== -->
+  <div id="ordersDrawerBackdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden transition-opacity duration-300 opacity-0" aria-hidden="true"></div>
+  <aside
+    id="ordersDrawer"
+    class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-surface-cardDark shadow-drawer border-l border-appBorder-light dark:border-appBorder-dark transform translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Мои заказы"
+  >
+    <div class="p-5 border-b border-appBorder-light dark:border-appBorder-dark flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+        <h3 class="font-extrabold text-lg text-textMain-light dark:text-textMain-dark">Мои заказы</h3>
+      </div>
+      <button type="button" id="ordersDrawerCloseBtn" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" aria-label="Закрыть">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <div id="ordersListContainer" class="flex-1 overflow-y-auto p-5 space-y-4">
+      <!-- Заказы рендерятся динамически -->
+    </div>
+  </aside>
+
+  <!-- ==================== МОДАЛЬНОЕ ОКНО ОФОРМЛЕНИЯ ЗАКАЗА ==================== -->
+  <div id="checkoutModalBackdrop" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-white dark:bg-surface-cardDark rounded-3xl border border-appBorder-light dark:border-appBorder-dark shadow-drawer overflow-hidden animate-fadeIn space-y-5 p-6 sm:p-8 relative">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-extrabold text-textMain-light dark:text-textMain-dark">Оформление заказа</h3>
+        <button type="button" id="checkoutCloseBtn" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <p class="text-xs text-textSub-light dark:text-textSub-dark">
+        * Это демонстрационный режим покупки. Реальные списания денег не производятся.
+      </p>
+
+      <form id="checkoutForm" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-textMain-light dark:text-textMain-dark mb-1">ФИО получателя *</label>
+          <input
+            type="text"
+            id="orderCustomerName"
+            required
+            placeholder="Иван Иванов"
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-appBorder-light dark:border-appBorder-dark text-textMain-light dark:text-textMain-dark focus:ring-2 focus:ring-brand focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block font-bold text-textMain-light dark:text-textMain-dark mb-1">Номер телефона (только цифры) *</label>
+          <input
+            type="tel"
+            id="orderCustomerPhone"
+            required
+            placeholder="+998 90 123 45 67 или +7..."
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-appBorder-light dark:border-appBorder-dark text-textMain-light dark:text-textMain-dark focus:ring-2 focus:ring-brand focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block font-bold text-textMain-light dark:text-textMain-dark mb-1">Адрес доставки *</label>
+          <input
+            type="text"
+            id="orderCustomerAddress"
+            required
+            placeholder="Город, улица, дом, квартира"
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-appBorder-light dark:border-appBorder-dark text-textMain-light dark:text-textMain-dark focus:ring-2 focus:ring-brand focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block font-bold text-textMain-light dark:text-textMain-dark mb-1">Способ оплаты</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-2 p-3 rounded-xl border border-appBorder-light dark:border-appBorder-dark cursor-pointer bg-slate-50 dark:bg-slate-900">
+              <input type="radio" name="paymentMethod" value="card" checked class="accent-brand">
+              <span class="font-semibold text-textMain-light dark:text-textMain-dark">Картой онлайн</span>
+            </label>
+            <label class="flex items-center gap-2 p-3 rounded-xl border border-appBorder-light dark:border-appBorder-dark cursor-pointer bg-slate-50 dark:bg-slate-900">
+              <input type="radio" name="paymentMethod" value="cash" class="accent-brand">
+              <span class="font-semibold text-textMain-light dark:text-textMain-dark">При получении</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Итог к оплате -->
+        <div class="pt-3 border-t border-appBorder-light dark:border-appBorder-dark flex justify-between items-center text-sm font-extrabold text-textMain-light dark:text-textMain-dark">
+          <span>Сумма заказа:</span>
+          <span id="checkoutTotalAmount">$0.00</span>
+        </div>
+
+        <button
+          type="submit"
+          id="checkoutSubmitBtn"
+          class="w-full py-3.5 rounded-xl bg-brand hover:bg-brand-600 text-white font-bold text-xs tracking-wide shadow-glow transition-all active:scale-95"
+        >
+          Подтвердить и оформить заказ
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== ОКНО «СПАСИБО ЗА ЗАКАЗ» (С КНОПКОЙ «СКАЧАТЬ ЧЕК») ==================== -->
+  <div id="orderSuccessModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white dark:bg-surface-cardDark rounded-3xl border border-appBorder-light dark:border-appBorder-dark p-6 sm:p-8 text-center space-y-4 shadow-drawer">
+      <div class="w-14 h-14 rounded-full bg-emerald-500/10 text-emerald-500 mx-auto flex items-center justify-center">
+        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+      </div>
+
+      <h3 class="text-xl font-extrabold text-textMain-light dark:text-textMain-dark">Заказ успешно оформлен!</h3>
+      <p class="text-xs text-textSub-light dark:text-textSub-dark">
+        Номер заказа: <strong id="successOrderNumber" class="text-brand font-black text-sm">#000000</strong>
+      </p>
+
+      <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300">
+        Внимание: Это демонстрационный заказ платформы AUREON. Заказ сохранён локально в браузере и нигде не обрабатывается.
+      </div>
+
+      <div class="flex flex-col gap-2 pt-2">
+        <button
+          type="button"
+          id="downloadReceiptBtn"
+          class="w-full py-3 rounded-xl bg-brand hover:bg-brand-600 text-white font-bold text-xs shadow-glow transition-all active:scale-95 flex items-center justify-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+          <span>Скачать чек (.txt)</span>
+        </button>
+
+        <button
+          type="button"
+          id="successModalCloseBtn"
+          class="w-full py-2.5 rounded-xl border border-appBorder-light dark:border-appBorder-dark font-semibold text-xs text-textMain-light dark:text-textMain-dark hover:bg-slate-100 dark:hover:bg-slate-800"
+        >
+          Продолжить покупки
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ПОЛНОЭКРАННЫЙ ЛАЙТБОКС ГАЛЕРЕИ (LIGHTBOX) ==================== -->
+  <div id="galleryLightbox" class="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4">
+    <button type="button" id="lightboxCloseBtn" class="absolute top-6 right-6 text-white/70 hover:text-white p-2 rounded-xl focus:outline-none" aria-label="Закрыть просмотр">
+      <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+    </button>
+    <button type="button" id="lightboxPrevBtn" class="absolute left-6 text-white/70 hover:text-white p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all" aria-label="Предыдущая">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+    </button>
+    <img id="lightboxImage" src="" alt="Полноэкранное изображение" class="max-h-[85vh] max-w-[85vw] object-contain select-none transition-all">
+    <button type="button" id="lightboxNextBtn" class="absolute right-6 text-white/70 hover:text-white p-3 rounded-full bg-white/10 hover:bg-white/20 transition-all" aria-label="Следующая">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+    </button>
+  </div>
+
+  <!-- Кнопка «Наверх» -->
+  <button
+    type="button"
+    id="scrollToTopBtn"
+    class="fixed bottom-6 left-6 z-30 p-3 rounded-2xl bg-white dark:bg-surface-cardDark border border-appBorder-light dark:border-appBorder-dark shadow-subtle hover:shadow-subtle-hover text-brand opacity-0 pointer-events-none transition-all duration-300 active:scale-95"
+    title="Вернуться наверх"
+    aria-label="Наверх"
+  >
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+  </button>
+
+  <!-- ==================== ТОСТЫ (ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ) ==================== -->
+  <div
+    id="toastContainer"
+    class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none max-w-sm w-full"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+
+  <!-- Подключение основного скрипта -->
+  <script src="./main.js"></script>
+</body>
+</html>
